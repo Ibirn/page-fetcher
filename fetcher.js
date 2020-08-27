@@ -3,20 +3,25 @@ const request = require("request");
 const args = process.argv.slice(2);
 
 const makingFetchHappen = (args) => {
-  fs.writeFile(`${args[1]}`, `${args[0]}`, 'utf8', (err, data) => {
-    if (err) {
-      console.log("ERROR: ", err)
-    }
-    else {
-    }
-  })
-  // request(`${args[0]}`, (error, response, body) => {
-  //   console.log('error:', error)
-  //   console.log('statusCode:', response && response.statusCode);
-  //   console.log('body:', body);
-  // })
+  request(`${args[0]}`, (error, response, body) => {
 
-  console.log(`${args[0]} ${args[1]}`)
+    if (error) {
+      console.log('Error: Domain does not exist.\n', error)
+      return
+    }
+    if(response.statusCode !== 200){
+      console.log('HTTP error:', response && response.statusCode,"\nPlease double-check your URL.")
+      return
+    }
+
+    fs.writeFile(`${args[1]}`, `${body}`, 'utf8', (err, data) => {
+      if (err) {
+        console.log("Error: Local path invalid.\n", err)
+      }
+      else {
+        console.log(`Downloaded and saved ${body.length} bytes to ${args[1]}`)
+      }
+    });
+  });
 }
-
 makingFetchHappen(args)
